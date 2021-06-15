@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>Mask Status Image Classification</h1>
+    <h1>Mask Wear Image Classification</h1>
     <img src="./asset/logo.png" alt="logo"/>
     <small><strong>Photo by <a href="https://unsplash.com/@visuals?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">visuals</a> on <a href="https://unsplash.com/s/photos/covid-mask?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></strong></small>
 </div>
