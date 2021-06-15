@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>😷 Mask Status Image Classification 😷</h1>
+    <h1>Mask Status Image Classification</h1>
     <img src="./asset/logo.png" alt="logo"/>
     <small><strong>Photo by <a href="https://unsplash.com/@visuals?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">visuals</a> on <a href="https://unsplash.com/s/photos/covid-mask?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></strong></small>
 </div>
@@ -46,8 +46,6 @@
 ### 평가 지표: <i>Macro F1 Score</i>
 
 <!-- $F_1 = 2 * \frac{precision*recall}{precision+recall}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://render.githubusercontent.com/render/math?math=F_1%20%3D%202%20*%20%5Cfrac%7Bprecision*recall%7D%7Bprecision%2Brecall%7D" height="30px"/>
-
-<br/>
 
 <!-- $precision = \frac{TP}{TP+FP}, \qquad recall = \frac{TP}{TP+FN}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://render.githubusercontent.com/render/math?math=precision%20%3D%20%5Cfrac%7BTP%7D%7BTP%2BFP%7D%2C%20%5Cqquad%20recall%20%3D%20%5Cfrac%7BTP%7D%7BTP%2BFN%7D" height="28px"/>
 
@@ -111,7 +109,7 @@
 
 ### Resume Training with SGD
 
-- [The Marginal Value of Adaptive Gradient Methods in Machine Learning](https://arxiv.org/pdf/1705.08292.pdf)에 따르면, *MadGrad*가 *SGD*와 *Adam*의 장점을 섞은 방법이지만, Adaptive Method이기 때문에 SGD보다는 성능이 떨어질 수 밖에 없다.
+- [The Marginal Value of Adaptive Gradient Methods in Machine Learning](https://arxiv.org/pdf/1705.08292.pdf)에 따르면, *MadGrad*가 *SGD*와 *Adam*의 장점을 섞은 방법이지만, Adaptive Method이기 때문에 *SGD*보다는 성능이 떨어질 수 밖에 없다.
 - 그래서 성능이 잘 나온 모델의 checkpoint를 불러오고 optimizer를 SGD로 변경하여 1 ~ 3 epoch 정도 학습을 더 진행했다. 그 결과 F1 Score가 0.76으로,정확도도 80%로 상승했고, 2 epoch일 때 가장 좋은 성능(정확도 80.5556%, F1 Score 0.7624)을 보였다.
 
 ### Ensemble
