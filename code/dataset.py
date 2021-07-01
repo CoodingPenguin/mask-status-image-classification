@@ -11,8 +11,16 @@ from torchvision import transforms
 from torchvision.transforms import *
 
 IMG_EXTENSIONS = [
-    ".jpg", ".JPG", ".jpeg", ".JPEG", ".png",
-    ".PNG", ".ppm", ".PPM", ".bmp", ".BMP",
+    ".jpg",
+    ".JPG",
+    ".jpeg",
+    ".JPEG",
+    ".png",
+    ".PNG",
+    ".ppm",
+    ".PPM",
+    ".bmp",
+    ".BMP",
 ]
 
 
@@ -22,22 +30,20 @@ def is_image_file(filename):
 
 class BaseAugmentation:
     def __init__(self, resize, mean, std, **args):
-        self.transform = transforms.Compose([
-            Resize(resize, Image.BILINEAR),
-            ToTensor(),
-            Normalize(mean=mean, std=std),
-        ])
+        self.transform = transforms.Compose(
+            [
+                Resize(resize, Image.BILINEAR),
+                ToTensor(),
+                Normalize(mean=mean, std=std),
+            ]
+        )
 
     def __call__(self, image):
         return self.transform(image)
 
-    
+
 class AddGaussianNoise(object):
-    """
-        transform 에 없는 기능들은 이런식으로 __init__, __call__, __repr__ 부분을
-        직접 구현하여 사용할 수 있습니다.
-    """
-    def __init__(self, mean=0., std=1.):
+    def __init__(self, mean=0.0, std=1.0):
         self.std = std
         self.mean = mean
 
@@ -45,36 +51,42 @@ class AddGaussianNoise(object):
         return tensor + torch.randn(tensor.size()) * self.std + self.mean
 
     def __repr__(self):
-        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+        return self.__class__.__name__ + "(mean={0}, std={1})".format(
+            self.mean, self.std
+        )
 
 
 class CustomAugmentation:
     def __init__(self, resize, mean, std, **args):
-        self.transform = transforms.Compose([
-            CenterCrop((320, 256)),
-            Resize(resize, Image.BILINEAR),
-            ColorJitter(0.1, 0.1, 0.1, 0.1),
-            ToTensor(),
-            Normalize(mean=mean, std=std),
-            AddGaussianNoise()
-        ])
+        self.transform = transforms.Compose(
+            [
+                CenterCrop((320, 256)),
+                Resize(resize, Image.BILINEAR),
+                ColorJitter(0.1, 0.1, 0.1, 0.1),
+                ToTensor(),
+                Normalize(mean=mean, std=std),
+                AddGaussianNoise(),
+            ]
+        )
 
     def __call__(self, image):
         return self.transform(image)
 
-    
+
 class CenterAugmentation:
     def __init__(self, resize, mean, std, **args):
-        self.transform = transforms.Compose([
-            CenterCrop(380),
-            ToTensor(),
-            Normalize(mean=mean, std=std),
-        ])
+        self.transform = transforms.Compose(
+            [
+                CenterCrop(380),
+                ToTensor(),
+                Normalize(mean=mean, std=std),
+            ]
+        )
 
     def __call__(self, image):
         return self.transform(image)
 
-    
+
 class MaskBaseDataset(data.Dataset):
     num_classes = 3 * 2 * 3
 
@@ -97,7 +109,7 @@ class MaskBaseDataset(data.Dataset):
         "mask4": MaskLabels.mask,
         "mask5": MaskLabels.mask,
         "incorrect_mask": MaskLabels.incorrect,
-        "normal": MaskLabels.normal
+        "normal": MaskLabels.normal,
     }
 
     image_paths = []
@@ -105,7 +117,13 @@ class MaskBaseDataset(data.Dataset):
     gender_labels = []
     age_labels = []
 
-    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+    def __init__(
+        self,
+        data_dir,
+        mean=(0.548, 0.504, 0.479),
+        std=(0.237, 0.247, 0.246),
+        val_ratio=0.2,
+    ):
         self.data_dir = data_dir
         self.mean = mean
         self.std = std
@@ -124,10 +142,14 @@ class MaskBaseDataset(data.Dataset):
             img_folder = os.path.join(self.data_dir, profile)
             for file_name in os.listdir(img_folder):
                 _file_name, ext = os.path.splitext(file_name)
-                if _file_name not in self._file_names:  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
+                if (
+                    _file_name not in self._file_names
+                ):  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
                     continue
 
-                img_path = os.path.join(self.data_dir, profile, file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
+                img_path = os.path.join(
+                    self.data_dir, profile, file_name
+                )  # (resized_data, 000004_male_Asian_54, mask1.jpg)
                 mask_label = self._file_names[_file_name]
 
                 id, gender, race, age = profile.split("_")
@@ -142,7 +164,9 @@ class MaskBaseDataset(data.Dataset):
     def calc_statistics(self):
         has_statistics = self.mean is not None and self.std is not None
         if not has_statistics:
-            print("[Warning] Calculating statistics... It can takes huge amounts of time depending on your CPU machine :(")
+            print(
+                "[Warning] Calculating statistics... It can takes huge amounts of time depending on your CPU machine :("
+            )
             sums = []
             squared = []
             for image_path in self.image_paths[:3000]:
@@ -211,12 +235,19 @@ class MaskBaseDataset(data.Dataset):
 
 class MaskSplitByProfileDataset(MaskBaseDataset):
     """
-        train / val 나누는 기준을 이미지에 대해서 random 이 아닌
-        사람(profile)을 기준으로 나눕니다.
-        구현은 val_ratio 에 맞게 train / val 나누는 것을 이미지 전체가 아닌 사람(profile)에 대해서 진행하여 indexing 을 합니다
-        이후 `split_dataset` 에서 index 에 맞게 Subset 으로 dataset 을 분기합니다.
+    train / val 나누는 기준을 이미지에 대해서 random 이 아닌
+    사람(profile)을 기준으로 나눕니다.
+    구현은 val_ratio 에 맞게 train / val 나누는 것을 이미지 전체가 아닌 사람(profile)에 대해서 진행하여 indexing 을 합니다
+    이후 `split_dataset` 에서 index 에 맞게 Subset 으로 dataset 을 분기합니다.
     """
-    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+
+    def __init__(
+        self,
+        data_dir,
+        mean=(0.548, 0.504, 0.479),
+        std=(0.237, 0.247, 0.246),
+        val_ratio=0.2,
+    ):
         self.indices = defaultdict(list)
         super().__init__(data_dir, mean, std, val_ratio)
 
@@ -227,10 +258,7 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
 
         val_indices = set(random.choices(range(length), k=n_val))
         train_indices = set(range(length)) - val_indices
-        return {
-            "train": train_indices,
-            "val": val_indices
-        }
+        return {"train": train_indices, "val": val_indices}
 
     def setup(self):
         profiles = os.listdir(self.data_dir)
@@ -244,10 +272,14 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
                 img_folder = os.path.join(self.data_dir, profile)
                 for file_name in os.listdir(img_folder):
                     _file_name, ext = os.path.splitext(file_name)
-                    if _file_name not in self._file_names:  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
+                    if (
+                        _file_name not in self._file_names
+                    ):  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
                         continue
 
-                    img_path = os.path.join(self.data_dir, profile, file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
+                    img_path = os.path.join(
+                        self.data_dir, profile, file_name
+                    )  # (resized_data, 000004_male_Asian_54, mask1.jpg)
                     mask_label = self._file_names[_file_name]
 
                     id, gender, race, age = profile.split("_")
@@ -267,17 +299,17 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
 
 
 class TestDataset(data.Dataset):
-    def __init__(self, img_paths, resize, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246)):
+    def __init__(
+        self, img_paths, resize, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246)
+    ):
         self.img_paths = img_paths
-        self.transform = transforms.Compose([
-#             CenterCrop((320, 256)),
-#             Resize(resize, Image.BILINEAR),
-#             ToTensor(),
-#             Normalize(mean=mean, std=std),
-            CenterCrop(380),
-            ToTensor(),
-            Normalize(mean=mean, std=std),
-        ])
+        self.transform = transforms.Compose(
+            [
+                CenterCrop(380),
+                ToTensor(),
+                Normalize(mean=mean, std=std),
+            ]
+        )
 
     def __getitem__(self, index):
         image = Image.open(self.img_paths[index])
