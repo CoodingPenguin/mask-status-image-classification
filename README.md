@@ -13,9 +13,19 @@
 ## 📝 Table of Contents
 
 - [대회 개요](#-대회-개요)
+  - [배경](#배경)
+  - [문제 정의](#문제-정의)
+  - [평가지표: mAP50](#평가-지표-macro-f1-score)
 - [대회 결과](#-대회-결과)
 - [EDA](#-eda)
+  - [train과 eval 데이터](#train과-eval-데이터)
+  - [train 피처의 고유값](#train-피처의-고유값)
+  - [train 피처의 분포](#train-피처의-분포)
 - [접근 방법](#-접근-방법)
+  - [Validation Method](#validation-method)
+  - [Best Single Model](#best-single-model)
+  - [Resuming Training with SGD](#resuming-training-with-sgd)
+  - [Ensemble](#ensemble) 
 - [시도했으나 잘 안된 것](#-시도했으나-잘-안된-것)
 - [회고](#-회고)
 
